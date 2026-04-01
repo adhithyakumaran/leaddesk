@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeadDesk — Adhithya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d0d;
+  --surface:#161616;
+  --surface2:#1f1f1f;
+  --surface3:#2a2a2a;
+  --border:#2e2e2e;
+  --border2:#3a3a3a;
+  --text:#f0f0f0;
+  --text2:#9ca3af;
+  --text3:#6b7280;
+  --white:#ffffff;
+  --accent:#ffffff;
+  --accent2:#e5e5e5;
+  --new:#4b5563;
+  --reached:#3b82f6;
+  --confirmed:#22c55e;
+  --rejected:#ef4444;
+  --star:#f59e0b;
+  --r:8px;
+  --r2:10px;
+}
+html{height:100%}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;line-height:1.5;min-height:100%;-webkit-font-smoothing:antialiased}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:#1e2d45}
+
+#app{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── HEADER ── */
+#header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;height:62px;
+  border-bottom:1px solid var(--border);
+  background:rgba(6,9,18,0.92);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  position:sticky;top:0;z-index:100;
+}
+#header-left{display:flex;align-items:center;gap:24px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-mark{
+  width:34px;height:34px;
+  background:var(--white);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;color:#000;letter-spacing:-0.5px;flex-shrink:0;
+}
+.logo-text{font-weight:700;font-size:16px;color:var(--white);letter-spacing:-0.5px}
+.logo-sub{font-size:11px;color:var(--text3);margin-top:-1px}
+#header-right{display:flex;align-items:center;gap:8px}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:7px 15px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--surface2);color:var(--text);cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:500;
+  transition:all 0.15s;white-space:nowrap;text-decoration:none;
+}
+.btn:hover{background:var(--surface3);border-color:var(--border2);color:var(--white);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:0.35;cursor:not-allowed;transform:none!important}
+.btn-primary{
+  background:var(--white);
+  color:#000;border-color:var(--white);
+}
+.btn-primary:hover{background:#e5e5e5;border-color:#e5e5e5;color:#000}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--text2)}
+.btn-ghost:hover{background:var(--surface2);border-color:var(--border);color:var(--text)}
+.btn-icon{padding:7px;width:32px;height:32px;justify-content:center}
+.btn svg{flex-shrink:0}
+
+/* ── UPLOAD ZONE ── */
+#upload-wrap{padding:28px 28px 0}
+#upload-zone{
+  border:1.5px dashed var(--border2);border-radius:16px;
+  padding:52px 36px;text-align:center;cursor:pointer;
+  transition:all 0.25s;
+  background:var(--surface);
+  position:relative;
+}
+#upload-zone:hover,#upload-zone.drag{
+  border-color:#555;
+  background:var(--surface2);
+}
+#upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.upload-icon-wrap{
+  width:60px;height:60px;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;
+  transition:all 0.25s;
+}
+#upload-zone:hover .upload-icon-wrap{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.3)}
+#upload-zone .upload-title{font-size:15px;font-weight:600;color:var(--white);margin-bottom:6px}
+#upload-zone .upload-sub{font-size:12px;color:var(--text3)}
+#upload-zone .upload-sub span{color:var(--accent);font-weight:500}
+
+/* ── STATS ── */
+#stats{display:flex;gap:12px;padding:24px 28px 0;flex-wrap:wrap}
+.stat{
+  flex:1;min-width:110px;padding:18px 20px 16px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);
+  position:relative;overflow:hidden;
+  transition:transform 0.15s,box-shadow 0.15s;
+}
+.stat:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.35)}
+.stat::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+}
+.stat-total::before{background:#555}
+.stat-new::before{background:#475569}
+.stat-reached::before{background:#3b82f6}
+.stat-confirmed::before{background:#10b981}
+.stat-rejected::before{background:#ef4444}
+.stat-rate::before{background:linear-gradient(90deg,#f59e0b,#10b981)}
+.stat-val{font-size:30px;font-weight:800;color:var(--white);line-height:1;margin-bottom:4px;letter-spacing:-1.5px}
+.stat-label{font-size:10px;color:var(--text3);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px}
+.stat-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.dot-new{background:#475569}
+.dot-reached{background:#3b82f6}
+.dot-confirmed{background:#10b981}
+.dot-rejected{background:#ef4444}
+.dot-total{background:#555}
+.stat-bar-wrap{height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden}
+.stat-bar{height:100%;border-radius:99px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1);min-width:0}
+.stat-pct{font-size:10px;color:var(--text3);margin-top:5px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* ── BULK ACTIONS BAR ── */
+#bulk-bar{
+  display:none;align-items:center;gap:12px;
+  padding:10px 28px;
+  background:var(--surface2);
+  border-bottom:1px solid var(--border2);
+  animation:slideDown 0.2s ease;
+}
+#bulk-bar.visible{display:flex}
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+#bulk-count{font-size:12px;font-weight:700;color:var(--accent)}
+#bulk-status-sel{
+  padding:6px 28px 6px 10px;background:var(--surface2);
+  border:1px solid var(--border2);border-radius:var(--r);
+  color:var(--text);font-family:'Inter',sans-serif;font-size:12px;outline:none;cursor:pointer;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;
+}
+#bulk-clear{margin-left:auto}
+
+/* ── FILTER BAR ── */
+#filter-bar{
+  display:flex;align-items:center;gap:10px;padding:16px 28px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+}
+.search-wrap{position:relative;flex:1;min-width:200px}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+#search{
+  width:100%;padding:8px 10px 8px 36px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r);color:var(--text);
+  font-family:'Inter',sans-serif;font-size:12px;outline:none;transition:all 0.15s;
+}
+#search:focus{border-color:#555}
+#search::placeholder{color:var(--text3)}
+select.filter-sel{
+  padding:8px 28px 8px 10px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r);color:var(--text2);
+  font-family:'Inter',sans-serif;font-size:12px;outline:none;cursor:pointer;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;
+  transition:all 0.15s;min-width:130px;
+}
+select.filter-sel:focus{border-color:#555;color:var(--text)}
+.filter-toggle{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 12px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--surface);color:var(--text2);cursor:pointer;
+  font-size:12px;font-weight:500;transition:all 0.15s;font-family:'Inter',sans-serif;
+}
+.filter-toggle:hover{border-color:var(--star);color:var(--star)}
+.filter-toggle.active{border-color:var(--star);color:var(--star);background:rgba(245,158,11,0.08)}
+#filter-info{font-size:11px;color:var(--text3);white-space:nowrap;margin-left:auto}
+
+/* ── TABLE CONTAINER ── */
+#table-wrap{padding:0 28px 0;overflow-x:auto}
+table{
+  width:100%;border-collapse:separate;border-spacing:0;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);
+  overflow:hidden;font-size:12px;
+}
+thead th{
+  background:var(--surface2);padding:11px 12px;text-align:left;
+  font-weight:600;font-size:10px;color:var(--text3);letter-spacing:0.6px;text-transform:uppercase;
+  border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;
+  position:sticky;top:0;z-index:1;
+}
+thead th:hover{color:var(--text2)}
+thead th.sort-asc::after{content:' ↑';color:var(--accent)}
+thead th.sort-desc::after{content:' ↓';color:var(--accent)}
+th.col-check,td.col-check{width:38px;padding:0 8px 0 14px;cursor:default}
+th.col-star,td.col-star{width:36px;padding:0 6px;text-align:center;cursor:default}
+input[type="checkbox"]{width:14px;height:14px;accent-color:var(--accent);cursor:pointer}
+
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.12s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,0.025)}
+tbody tr.selected{background:rgba(255,255,255,0.05)}
+tbody tr.row-reached{border-left:2px solid var(--reached)}
+tbody tr.row-confirmed{border-left:2px solid var(--confirmed)}
+tbody tr.row-rejected{border-left:2px solid var(--rejected)}
+tbody tr.row-new{border-left:2px solid transparent}
+
+td{padding:10px 12px;vertical-align:middle;color:var(--text)}
+td.sno{color:var(--text3);font-size:11px;width:40px;font-variant-numeric:tabular-nums}
+td.name{font-weight:600;color:var(--white);max-width:200px}
+td.name .biz-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:190px}
+td.name .biz-cat{font-size:10px;color:var(--text3);font-weight:400;margin-top:2px}
+td.loc .city{font-weight:500}
+td.loc .area{font-size:11px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+
+/* ── STAR BUTTON ── */
+.star-btn{
+  background:none;border:none;cursor:pointer;padding:4px;border-radius:4px;
+  color:var(--text3);transition:color 0.15s,transform 0.15s;
+  display:flex;align-items:center;justify-content:center;
+}
+.star-btn:hover{color:var(--star);transform:scale(1.25)}
+.star-btn.starred{color:var(--star)}
+
+/* ── PHONE / WA CELLS ── */
+td.contact-cell{width:90px}
+a.phone-link{
+  display:inline-flex;align-items:center;gap:5px;
+  color:var(--text2);text-decoration:none;font-size:11px;font-weight:500;
+  padding:4px 9px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);
+  transition:all 0.15s;white-space:nowrap;
+}
+a.phone-link:hover{color:var(--white);border-color:var(--border2);background:var(--surface3)}
+a.phone-link.disabled{opacity:0.35;pointer-events:none}
+.wa-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  color:#25d366;font-size:11px;font-weight:500;
+  padding:4px 9px;border-radius:5px;border:1px solid rgba(37,211,102,0.2);background:rgba(37,211,102,0.06);
+  cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;white-space:nowrap;
+}
+.wa-btn:hover{background:rgba(37,211,102,0.14);border-color:rgba(37,211,102,0.35)}
+.wa-btn:disabled{opacity:0.35;cursor:not-allowed}
+
+/* ── QUALITY BADGE ── */
+.badge{
+  display:inline-flex;align-items:center;
+  padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;
+}
+.badge-high{background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.25)}
+.badge-medium{background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2)}
+.badge-low{background:rgba(107,114,128,0.1);color:#6b7280;border:1px solid rgba(107,114,128,0.2)}
+
+/* ── STATUS SELECT ── */
+select.status-sel{
+  padding:4px 22px 4px 9px;border-radius:99px;font-size:11px;font-weight:600;
+  font-family:'Inter',sans-serif;cursor:pointer;outline:none;border:1px solid;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M1 1l3 3 3-3' stroke='%236b7280' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 6px center;
+  transition:all 0.15s;
+}
+.sel-New{background:rgba(71,85,105,0.15);color:#94a3b8;border-color:rgba(71,85,105,0.3)}
+.sel-Reached{background:rgba(59,130,246,0.12);color:#60a5fa;border-color:rgba(59,130,246,0.3)}
+.sel-Confirmed{background:rgba(16,185,129,0.12);color:#34d399;border-color:rgba(16,185,129,0.3)}
+.sel-Rejected{background:rgba(239,68,68,0.12);color:#f87171;border-color:rgba(239,68,68,0.3)}
+
+/* ── NOTES INPUT ── */
+input.notes-inp{
+  width:100%;padding:5px 8px;background:transparent;border:1px solid transparent;
+  border-radius:5px;color:var(--text2);font-family:'Inter',sans-serif;font-size:11px;
+  outline:none;transition:all 0.15s;min-width:140px;
+}
+input.notes-inp:hover{border-color:var(--border);background:var(--surface2)}
+input.notes-inp:focus{border-color:#555;background:var(--surface2);color:var(--text)}
+input.notes-inp::placeholder{color:var(--text3)}
+
+/* ── EMPTY STATE ── */
+#empty-state{
+  text-align:center;padding:80px 24px;display:flex;flex-direction:column;align-items:center;gap:16px;
+}
+.empty-icon-wrap{
+  width:76px;height:76px;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  display:flex;align-items:center;justify-content:center;font-size:34px;
+}
+#empty-state h2{font-size:18px;font-weight:700;color:var(--text)}
+#empty-state p{font-size:13px;color:var(--text3);max-width:320px;line-height:1.7}
+#no-results{text-align:center;padding:48px;color:var(--text3);font-size:13px}
+
+/* ── PAGINATION ── */
+#pagination{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;border-top:1px solid var(--border);flex-wrap:wrap;gap:10px;
+  margin:0 28px 28px;
+  background:var(--surface);border:1px solid var(--border);
+  border-top:none;
+  border-radius:0 0 var(--r2) var(--r2);
+}
+.page-info{font-size:11px;color:var(--text3)}
+.page-controls{display:flex;align-items:center;gap:8px}
+.page-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;border-radius:6px;
+  border:1px solid var(--border);background:var(--surface2);
+  color:var(--text2);cursor:pointer;font-size:12px;transition:all 0.15s;
+  font-family:'Inter',sans-serif;
+}
+.page-btn:hover:not(:disabled){background:var(--surface3);color:var(--white);border-color:var(--border2)}
+.page-btn:disabled{opacity:0.35;cursor:not-allowed}
+select.page-size-sel{
+  padding:5px 24px 5px 8px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:6px;color:var(--text2);font-family:'Inter',sans-serif;font-size:12px;
+  outline:none;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 7px center;
+}
+
+/* ── MODAL ── */
+#modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  z-index:999;display:none;align-items:center;justify-content:center;padding:20px;
+}
+#modal-overlay.open{display:flex}
+#modal{
+  background:var(--surface);border:1px solid var(--border2);border-radius:16px;
+  width:100%;max-width:560px;max-height:90vh;overflow-y:auto;
+  box-shadow:0 32px 80px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.04);
+  animation:modalIn 0.2s cubic-bezier(0.34,1.2,0.64,1);
+}
+@keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding:22px 22px 16px;border-bottom:1px solid var(--border);
+}
+.modal-title{font-size:16px;font-weight:700;color:var(--white)}
+.modal-meta{font-size:11px;color:var(--text3);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap}
+.modal-tag{
+  background:var(--surface2);border:1px solid var(--border);border-radius:5px;
+  padding:2px 8px;font-size:10px;color:var(--text2);font-weight:500;
+}
+.modal-body{padding:20px 22px}
+.modal-label{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px}
+#wa-textarea{
+  width:100%;height:220px;padding:14px;background:var(--surface2);
+  border:1px solid var(--border);border-radius:var(--r);color:var(--text);
+  font-family:'Inter',sans-serif;font-size:12px;line-height:1.7;resize:vertical;outline:none;
+  transition:all 0.15s;
+}
+#wa-textarea:focus{border-color:#555}
+.modal-actions{display:flex;gap:10px;margin-top:14px;justify-content:flex-end}
+.copy-feedback{font-size:11px;color:var(--confirmed);opacity:0;transition:opacity 0.3s;align-self:center;margin-right:auto}
+.copy-feedback.show{opacity:1}
+.modal-info{
+  padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);
+  margin-bottom:16px;display:flex;gap:20px;flex-wrap:wrap;
+}
+.modal-info-item{font-size:11px;color:var(--text3)}
+.modal-info-item strong{color:var(--text);font-weight:500;display:block;margin-top:2px}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);
+  padding:11px 18px;font-size:12px;font-weight:500;color:var(--text);
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  transform:translateY(20px);opacity:0;
+  transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;
+}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.success{border-color:rgba(16,185,129,0.4);color:#34d399}
+#toast.error{border-color:rgba(239,68,68,0.4);color:#f87171}
+
+/* ── LOADING ── */
+.spin{
+  display:inline-block;width:14px;height:14px;border:2px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  #header{padding:0 16px}
+  #upload-wrap,#stats,#filter-bar{padding-left:16px;padding-right:16px}
+  #table-wrap{padding:0 16px}
+  #pagination{margin:0 16px 20px}
+  #stats{gap:8px}
+  .stat{min-width:calc(50% - 4px)}
+  .stat-val{font-size:24px}
+  #filter-info{display:none}
+  #filter-bar{gap:8px}
+  #bulk-bar{padding:10px 16px;flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HEADER -->
+<header id="header">
+  <div id="header-left">
+    <div class="logo">
+      <div class="logo-mark">LD</div>
+      <div>
+        <div class="logo-text">LeadDesk</div>
+        <div class="logo-sub">Adhithya Velkumaran</div>
+      </div>
+    </div>
+  </div>
+  <div id="header-right">
+    <button class="btn btn-ghost" id="upload-btn-header" title="Upload new file">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload
+    </button>
+    <button class="btn" id="export-btn" disabled title="Export filtered leads">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export CSV
+    </button>
+  </div>
+</header>
+
+<!-- BODY -->
+<div id="main">
+
+  <!-- UPLOAD ZONE -->
+  <div id="upload-wrap">
+    <div id="upload-zone">
+      <input type="file" id="file-input" accept=".xlsx,.xls,.csv">
+      <div class="upload-icon-wrap">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text2)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <div class="upload-title">Drop your Excel or CSV file here</div>
+      <div class="upload-sub">Supports <span>.xlsx · .xls · .csv</span> — columns detected automatically</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div id="stats">
+    <div class="stat stat-total">
+      <div class="stat-val" id="stat-total">—</div>
+      <div class="stat-label"><span class="stat-dot dot-total"></span>Total Leads</div>
+      <div class="stat-bar-wrap"><div class="stat-bar" id="bar-total" style="width:100%;background:#555"></div></div>
+    </div>
+    <div class="stat stat-new">
+      <div class="stat-val" id="stat-new">—</div>
+      <div class="stat-label"><span class="stat-dot dot-new"></span>New</div>
+      <div class="stat-bar-wrap"><div class="stat-bar" id="bar-new" style="width:0%;background:#475569"></div></div>
+      <div class="stat-pct" id="pct-new"></div>
+    </div>
+    <div class="stat stat-reached">
+      <div class="stat-val" id="stat-reached">—</div>
+      <div class="stat-label"><span class="stat-dot dot-reached"></span>Reached</div>
+      <div class="stat-bar-wrap"><div class="stat-bar" id="bar-reached" style="width:0%;background:#3b82f6"></div></div>
+      <div class="stat-pct" id="pct-reached"></div>
+    </div>
+    <div class="stat stat-confirmed">
+      <div class="stat-val" id="stat-confirmed">—</div>
+      <div class="stat-label"><span class="stat-dot dot-confirmed"></span>Confirmed</div>
+      <div class="stat-bar-wrap"><div class="stat-bar" id="bar-confirmed" style="width:0%;background:#10b981"></div></div>
+      <div class="stat-pct" id="pct-confirmed"></div>
+    </div>
+    <div class="stat stat-rejected">
+      <div class="stat-val" id="stat-rejected">—</div>
+      <div class="stat-label"><span class="stat-dot dot-rejected"></span>Rejected</div>
+      <div class="stat-bar-wrap"><div class="stat-bar" id="bar-rejected" style="width:0%;background:#ef4444"></div></div>
+      <div class="stat-pct" id="pct-rejected"></div>
+    </div>
+    <div class="stat stat-rate">
+      <div class="stat-val" id="stat-rate">—</div>
+      <div class="stat-label">Conversion Rate</div>
+      <div class="stat-bar-wrap"><div class="stat-bar" id="bar-rate" style="width:0%;background:linear-gradient(90deg,#f59e0b,#10b981)"></div></div>
+      <div class="stat-pct" id="pct-rate"></div>
+    </div>
+  </div>
+
+  <!-- BULK ACTIONS BAR -->
+  <div id="bulk-bar">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text2)"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span id="bulk-count">0 selected</span>
+    <span style="color:var(--text3);font-size:11px">·</span>
+    <span style="font-size:12px;color:var(--text2)">Set status:</span>
+    <select id="bulk-status-sel">
+      <option value="">Choose…</option>
+      <option value="New">New</option>
+      <option value="Reached">Reached</option>
+      <option value="Confirmed">Confirmed</option>
+      <option value="Rejected">Rejected</option>
+    </select>
+    <button class="btn btn-primary" id="bulk-apply" style="padding:6px 14px;font-size:12px">Apply</button>
+    <button class="btn btn-ghost" id="bulk-clear" style="font-size:12px">Clear</button>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div id="filter-bar" style="display:none">
+    <div class="search-wrap">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search" type="text" placeholder="Search by name, city, area, category…">
+    </div>
+    <select class="filter-sel" id="filter-city"><option value="">All Cities</option></select>
+    <select class="filter-sel" id="filter-cat"><option value="">All Categories</option></select>
+    <select class="filter-sel" id="filter-status">
+      <option value="">All Statuses</option>
+      <option value="New">New</option>
+      <option value="Reached">Reached</option>
+      <option value="Confirmed">Confirmed</option>
+      <option value="Rejected">Rejected</option>
+    </select>
+    <button class="filter-toggle" id="filter-starred" title="Show starred leads only">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Starred
+    </button>
+    <button class="btn btn-ghost" id="clear-filters">Clear</button>
+    <span id="filter-info"></span>
+  </div>
+
+  <!-- TABLE -->
+  <div id="table-section" style="display:none">
+    <div id="table-wrap">
+      <table id="leads-table">
+        <thead>
+          <tr>
+            <th class="col-check"><input type="checkbox" id="select-all" title="Select all on this page"></th>
+            <th class="col-star">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </th>
+            <th data-col="sno" class="no-sort">#</th>
+            <th data-col="businessName">Business</th>
+            <th data-col="city">Location</th>
+            <th data-col="phone" class="no-sort">Phone</th>
+            <th data-col="phone" class="no-sort">WhatsApp</th>
+            <th data-col="quality">Quality</th>
+            <th data-col="status">Status</th>
+            <th data-col="notes" class="no-sort">Notes</th>
+            <th data-col="action" class="no-sort">Draft</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div id="no-results" style="display:none">
+        <div style="font-size:22px;margin-bottom:8px;opacity:0.2">⊘</div>
+        No leads match your filters.
+      </div>
+    </div>
+    <!-- PAGINATION -->
+    <div id="pagination">
+      <div class="page-info" id="page-info">—</div>
+      <div class="page-controls">
+        <span style="font-size:11px;color:var(--text3);margin-right:4px">Rows:</span>
+        <select class="page-size-sel" id="page-size-sel">
+          <option value="25">25</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+          <option value="0">All</option>
+        </select>
+        <button class="page-btn" id="page-prev" title="Previous page" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span id="page-num" style="font-size:12px;color:var(--text2);min-width:54px;text-align:center">1 / 1</span>
+        <button class="page-btn" id="page-next" title="Next page" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div id="empty-state">
+    <div class="empty-icon-wrap">📋</div>
+    <h2>No leads loaded yet</h2>
+    <p>Upload your Excel or CSV file above to get started. Your statuses and notes are auto-saved.</p>
+  </div>
+
+</div><!-- /#main -->
+
+<!-- WA MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-biz-name">—</div>
+        <div class="modal-meta">
+          <span class="modal-tag" id="modal-cat">—</span>
+          <span class="modal-tag" id="modal-loc">—</span>
+        </div>
+      </div>
+      <button class="btn btn-icon btn-ghost" id="modal-close" title="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-info">
+        <div class="modal-info-item">Phone<strong id="modal-phone">—</strong></div>
+        <div class="modal-info-item">Quality<strong id="modal-quality">—</strong></div>
+        <div class="modal-info-item">Status<strong id="modal-status">—</strong></div>
+      </div>
+      <div class="modal-label">WhatsApp Message</div>
+      <textarea id="wa-textarea" spellcheck="true" placeholder="Message will appear here…"></textarea>
+      <div class="modal-actions">
+        <span class="copy-feedback" id="copy-feedback">✓ Copied!</span>
+        <button class="btn" id="copy-btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy Message
+        </button>
+        <button class="btn btn-primary" id="open-wa-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Open in WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ─── CONFIG ────────────────────────────────────────────────────────────────
+const SENDER = 'Adhithya';
+const LS_KEY = 'leaddesk_v1';
+
+// ─── WA TEMPLATES ──────────────────────────────────────────────────────────
+const WA_TEMPLATES = {
+  'Boutique': `Hi! I'm {sender}, a web designer based in {city}.
+
+I came across {businessName} in {area} and wanted to reach out — your collection deserves a proper online presence.
+
+A clean website can help you:
+• Showcase your latest collections
+• Accept pre-orders and enquiries 24/7
+• Reach customers outside {area}
+
+I'd love to share a quick concept for your store. Would you be open to a 5-min call? 🙏`,
+
+  'Gym': `Hi! I'm {sender}, I build websites for fitness businesses in {city}.
+
+I noticed {businessName} doesn't have an active website yet. Gyms in {area} that added one saw a clear increase in membership enquiries.
+
+A site can help you:
+• Show batch timings, fees, and trainers
+• Collect trial session requests
+• Build credibility with new members
+
+Can I show you a quick demo of what it'd look like for {businessName}? 💪`,
+
+  'Salon': `Hi! I'm {sender}, a web designer working with salons in {city}.
+
+I saw {businessName} in {area} and think a website could really help you stand out — especially for Google searches like "salon near me."
+
+You'd be able to:
+• Display your services and price list
+• Let clients book appointments directly
+• Showcase your work with a photo gallery
+
+Can I share a sample design with you? ✨`,
+
+  'Parlour': `Hi! I'm {sender}, a web designer working with beauty parlours in {city}.
+
+I saw {businessName} in {area} and think a website could really help you attract more bridal and regular clients.
+
+A simple site helps with:
+• Showing services, pricing, and availability
+• Building trust with before/after galleries
+• Getting found on Google Maps
+
+Want to see a quick mockup? 💄`,
+
+  'Coaching Center': `Hi! I'm {sender} — I create websites for coaching institutes in {city}.
+
+A website for {businessName} would help parents and students find you more easily, especially for searches like "coaching near {area}."
+
+Key benefits:
+• Display courses, batches, and fee structure
+• Collect admission enquiries online
+• Build trust with testimonials and results
+
+Would you like to see how it could look for your institute? 📚`,
+
+  'Restaurant': `Hi! I'm {sender}, I design websites for restaurants in {city}.
+
+For {businessName} in {area}, even a simple site can bring in more orders — especially when customers search for "restaurants near me."
+
+A website can help you:
+• Display your menu with photos
+• Collect table reservations or takeaway orders
+• Save on Zomato/Swiggy commissions with direct ordering
+
+Interested in a quick preview? 🍽️`,
+
+  'Yoga Studio': `Hi! I'm {sender} — I build websites for wellness and yoga studios in {city}.
+
+{businessName} has a wonderful offering, and a website would help more people in {area} discover your classes.
+
+It can include:
+• Class schedule and instructor profiles
+• Online registration for trial classes
+• A blog section for SEO and community
+
+Would you be open to a short conversation? 🧘`,
+
+  'Yoga/Wellness': `Hi! I'm {sender} — I build websites for wellness businesses in {city}.
+
+{businessName} in {area} deserves a digital presence that reflects the quality of your work. A website builds trust with new clients before they even visit.
+
+Would you like to see a quick concept? 🌿`,
+
+  'Bakery': `Hi! I'm {sender}, I work with bakeries and home bakers in {city}.
+
+{businessName}'s products deserve to reach more customers in {area} and beyond. A clean website or order page makes that easy.
+
+You could:
+• Display your menu and custom order options
+• Accept WhatsApp or form-based orders
+• Showcase photos of your work
+
+Want me to show you a quick concept? 🎂`,
+
+  'Dental Clinic': `Hi! I'm {sender} — I design websites for dental clinics in {city}.
+
+For {businessName}, a professional website builds instant trust with new patients searching online in {area}.
+
+It would cover:
+• Services offered and doctor profile
+• Appointment booking form
+• Patient FAQs and clinic timings
+
+Can I send you a sample layout? 🦷`,
+
+  'Florist': `Hi! I'm {sender}, I create websites for florists and flower shops in {city}.
+
+{businessName} could reach so many more customers with a simple online presence — especially for occasions like birthdays, weddings, and events in {area}.
+
+A website can help with:
+• Showcasing arrangements by occasion
+• Accepting custom orders online
+• Seasonal promotions
+
+Would you like to see a design demo? 🌸`,
+
+  'Pet Shop': `Hi! I'm {sender} — I build websites for pet businesses in {city}.
+
+{businessName} in {area} could attract a lot more pet owners with a website where they can browse your products and services.
+
+Key features:
+• Product catalogue (food, accessories, grooming)
+• Appointment booking for grooming or vet
+• Contact and location info
+
+Interested in a quick preview? 🐾`,
+
+  'Laundry': `Hi! I'm {sender} — I design websites for laundry and dry-clean services in {city}.
+
+For {businessName}, a simple website with an online pickup request form can save you calls while bringing in more customers from {area}.
+
+It would include:
+• Service list and pricing
+• Pickup/drop scheduling
+• Contact and location
+
+Want me to show you how it'd look? 👕`,
+
+  'Wedding Planner': `Hi! I'm {sender} — I build portfolio websites for wedding planners in {city}.
+
+{businessName} deserves a stunning online portfolio that reflects the quality of your work. Couples in {area} searching for planners will find you faster.
+
+Your site could feature:
+• Portfolio gallery of past weddings
+• Packages and service overview
+• Enquiry form for new clients
+
+Can I show you a sample design? 💍`,
+
+  'Photography Studio': `Hi! I'm {sender} — I design websites for photographers in {city}.
+
+A portfolio website for {businessName} would let your work speak for itself and bring in more clients searching for photographers in {area}.
+
+It can include:
+• Gallery organized by shoot type
+• Packages and pricing
+• Client booking/enquiry form
+
+Would you like to see a concept built around your style? 📸`,
+
+  'Art Classes': `Hi! I'm {sender} — I create websites for art institutes and creative studios in {city}.
+
+{businessName} in {area} could reach more students with a clean website that showcases your courses and student work.
+
+Features could include:
+• Course list, schedule, and fees
+• Gallery of student artwork
+• Online registration form
+
+Shall I share a quick demo? 🎨`,
+
+  'Electronics Repair': `Hi! I'm {sender} — I build websites for electronics repair shops in {city}.
+
+{businessName} in {area} could get a lot more walk-ins if people could find you easily when they search for repairs online.
+
+A simple site would cover:
+• Services offered (phones, laptops, appliances)
+• Turnaround time and pricing guide
+• Contact and location
+
+Want to see how it'd look? 🔧`,
+
+  'Organic Store': `Hi! I'm {sender} — I design websites for organic and natural product stores in {city}.
+
+{businessName} in {area} is the kind of brand that builds a loyal customer base online — especially with health-conscious buyers searching locally.
+
+Your site could feature:
+• Product catalogue with filters
+• Subscription or repeat order option
+• Health tips blog (great for SEO)
+
+Would you be open to a quick conversation? 🌱`,
+
+  'Catering': `Hi! I'm {sender} — I build websites for catering businesses in {city}.
+
+{businessName} could win more corporate and event clients in {area} with a professional website showcasing your menu and past events.
+
+Features:
+• Menu packages and cuisine types
+• Photo gallery from past events
+• Quote request form
+
+Want me to show you a concept? 🍱`,
+
+  'Tailor': `Hi! I'm {sender} — I design websites for tailors and alteration shops in {city}.
+
+A website for {businessName} would help customers in {area} find you when they search for custom stitching or alterations online.
+
+It can cover:
+• Services and specialties (bridal, formal, casual)
+• Sample work gallery
+• Booking or measurement enquiry form
+
+Interested in a quick preview? 🧵`,
+
+  'Handicraft': `Hi! I'm {sender} — I build websites for artisans and handicraft shops in {city}.
+
+{businessName}'s work deserves a wider audience. A website can help you reach buyers beyond {area} — including gift shoppers, interior designers, and collectors.
+
+Features:
+• Product gallery with categories
+• Custom order and enquiry option
+• Your story and craft background
+
+Can I show you how it'd look? 🏺`,
+
+  '_default': `Hi! I'm {sender}, a web designer based in {city}.
+
+I came across {businessName} in {area} and wanted to reach out. A professional website could help your business attract more customers online — especially people searching in {area}.
+
+Key benefits:
+• Be found on Google Maps and search
+• Build instant credibility with new customers
+• Accept enquiries and bookings 24/7
+
+I'd love to show you a quick concept. Would you be open to a short call? 🙏`
+};
+
+function getTemplate(category) {
+  if (!category) return WA_TEMPLATES['_default'];
+  const cat = category.toLowerCase();
+  for (const [key, tpl] of Object.entries(WA_TEMPLATES)) {
+    if (key === '_default') continue;
+    if (cat.includes(key.toLowerCase()) || key.toLowerCase().includes(cat)) return tpl;
+  }
+  if (cat.includes('boutique') || cat.includes('saree') || cat.includes('cloth')) return WA_TEMPLATES['Boutique'];
+  if (cat.includes('gym') || cat.includes('fitness')) return WA_TEMPLATES['Gym'];
+  if (cat.includes('salon')) return WA_TEMPLATES['Salon'];
+  if (cat.includes('parlour') || cat.includes('parlor') || cat.includes('beauty')) return WA_TEMPLATES['Parlour'];
+  if (cat.includes('coach') || cat.includes('tutori') || cat.includes('ias') || cat.includes('training')) return WA_TEMPLATES['Coaching Center'];
+  if (cat.includes('restaurant') || cat.includes('hotel') || cat.includes('café') || cat.includes('cafe') || cat.includes('bistro')) return WA_TEMPLATES['Restaurant'];
+  if (cat.includes('yoga') || cat.includes('meditation') || cat.includes('pilates') || cat.includes('wellness')) return WA_TEMPLATES['Yoga Studio'];
+  if (cat.includes('baker') || cat.includes('cake') || cat.includes('pastry') || cat.includes('sweet')) return WA_TEMPLATES['Bakery'];
+  if (cat.includes('dental') || cat.includes('clinic')) return WA_TEMPLATES['Dental Clinic'];
+  if (cat.includes('florist') || cat.includes('flower')) return WA_TEMPLATES['Florist'];
+  if (cat.includes('pet')) return WA_TEMPLATES['Pet Shop'];
+  if (cat.includes('laundry') || cat.includes('dry clean')) return WA_TEMPLATES['Laundry'];
+  if (cat.includes('wedding')) return WA_TEMPLATES['Wedding Planner'];
+  if (cat.includes('photo') || cat.includes('studio')) return WA_TEMPLATES['Photography Studio'];
+  if (cat.includes('art')) return WA_TEMPLATES['Art Classes'];
+  if (cat.includes('electron') || cat.includes('repair')) return WA_TEMPLATES['Electronics Repair'];
+  if (cat.includes('organic') || cat.includes('health food')) return WA_TEMPLATES['Organic Store'];
+  if (cat.includes('cater')) return WA_TEMPLATES['Catering'];
+  if (cat.includes('tailor') || cat.includes('stitch') || cat.includes('alteration')) return WA_TEMPLATES['Tailor'];
+  if (cat.includes('handicraft') || cat.includes('handcraft') || cat.includes('craft')) return WA_TEMPLATES['Handicraft'];
+  return WA_TEMPLATES['_default'];
+}
+
+// ─── COLUMN DETECTION ───────────────────────────────────────────────────────
+const COL_MAP = {
+  sno:          ['s.no','sno','serial','sl.no','sl no','#','sr no','sr.no'],
+  businessName: ['business name','business','company name','company','shop name','shop','store','establishment','name'],
+  category:     ['category','type','industry','segment','niche','vertical'],
+  city:         ['city','town','district','location'],
+  area:         ['area','locality','area/locality','neighborhood','zone','region','suburb'],
+  phone:        ['phone','mobile','contact','number','ph','tel','phone no','mobile no','contact no','cell'],
+  email:        ['email','mail','e-mail','email id','email address'],
+  website:      ['website','site','url','web','website status','has website','online presence'],
+  quality:      ['quality','lead quality','priority','grade','rating','score','lead score'],
+  whyNeeds:     ['why they need a website','why they need','why','reason','description','need','requirement','pitch'],
+  source:       ['source','from','origin','channel','lead source']
+};
+
+function detectColumns(headers) {
+  const norm = headers.map(h => String(h||'').toLowerCase().trim());
+  const colIdx = {};
+  const used = new Set();
+  for (const [key, variants] of Object.entries(COL_MAP)) {
+    for (let i = 0; i < norm.length; i++) {
+      if (used.has(i)) continue;
+      const h = norm[i];
+      if (variants.some(v => h === v || h.includes(v) || v.includes(h))) {
+        colIdx[key] = i; used.add(i); break;
+      }
+    }
+  }
+  return colIdx;
+}
+
+// ─── PHONE UTILS ─────────────────────────────────────────────────────────────
+function cleanPhone(raw) {
+  if (!raw) return '';
+  let s = String(raw).replace(/\D/g,'');
+  if (s.startsWith('0') && s.length === 11) s = '91' + s.slice(1);
+  if (s.length === 10) s = '91' + s;
+  return s;
+}
+function displayPhone(raw) {
+  if (!raw) return '';
+  const s = String(raw).trim();
+  return s.replace(/(\+91|91)?(\d{5})(\d{5})/, (_,p,a,b) => `${a} ${b}`);
+}
+
+// ─── ID GENERATION ───────────────────────────────────────────────────────────
+function generateId(name, phone) {
+  const str = (name||'') + (phone||'');
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash |= 0; }
+  return 'id_' + Math.abs(hash).toString(36);
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let state = {
+  leads: [],
+  filtered: [],
+  sortCol: null,
+  sortDir: 'asc',
+  activeModal: null,
+  filters: { search:'', city:'', cat:'', status:'', starred: false },
+  selected: new Set()
+};
+
+let page = { current: 1, size: 50 };
+
+// ─── PERSISTENCE ─────────────────────────────────────────────────────────────
+function loadSaved() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch { return []; }
+}
+function saveToStorage() {
+  const data = state.leads.map(l => ({ id:l._id, status:l.status, notes:l.notes, starred:l.starred }));
+  localStorage.setItem(LS_KEY, JSON.stringify(data));
+}
+let saveTimer;
+function deferSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveToStorage, 400); }
+
+// ─── FILE PARSING ─────────────────────────────────────────────────────────────
+function parseFile(file) {
+  showToast('Reading file…', '');
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      let rows;
+      if (file.name.match(/\.csv$/i)) {
+        rows = parseCSV(e.target.result);
+      } else {
+        const wb = XLSX.read(e.target.result, { type:'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        rows = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
+      }
+      processRows(rows);
+    } catch(err) {
+      showToast('Failed to parse file: ' + err.message, 'error');
+    }
+  };
+  reader.onerror = () => showToast('File read error', 'error');
+  if (file.name.match(/\.csv$/i)) reader.readAsText(file);
+  else reader.readAsArrayBuffer(file);
+}
+
+function parseCSV(text) {
+  const rows = [];
+  const lines = text.split(/\r?\n/);
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const cells = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; continue; }
+      if (c === ',' && !inQ) { cells.push(cur); cur = ''; continue; }
+      cur += c;
+    }
+    cells.push(cur);
+    rows.push(cells);
+  }
+  return rows;
+}
+
+function processRows(rows) {
+  if (!rows || rows.length < 2) { showToast('File appears empty', 'error'); return; }
+  const headers = rows[0].map(String);
+  const colIdx = detectColumns(headers);
+  const savedMap = new Map(loadSaved().map(s => [s.id, s]));
+  const leads = [];
+  const seenIds = new Set();
+
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i];
+    if (!r || r.every(c => !String(c||'').trim())) continue;
+    const get = (key) => colIdx[key] !== undefined ? String(r[colIdx[key]]||'').trim() : '';
+    const name = get('businessName') || `Row ${i}`;
+    const phone = get('phone');
+    const id = generateId(name, phone);
+    if (seenIds.has(id)) continue;
+    seenIds.add(id);
+    const saved = savedMap.get(id);
+    leads.push({
+      _id: id,
+      sno: get('sno') || String(i),
+      businessName: name,
+      category: get('category'),
+      city: get('city'),
+      area: get('area'),
+      phone: phone,
+      email: get('email'),
+      website: get('website'),
+      quality: get('quality'),
+      whyNeeds: get('whyNeeds'),
+      source: get('source'),
+      status: saved ? saved.status : 'New',
+      notes: saved ? saved.notes : '',
+      starred: saved ? (saved.starred || false) : false
+    });
+  }
+
+  if (!leads.length) { showToast('No data rows found', 'error'); return; }
+  state.leads = leads;
+  state.selected.clear();
+  page.current = 1;
+  applyFilters();
+  renderAll();
+  populateFilterDropdowns();
+  showToast(`${leads.length} leads loaded`, 'success');
+  document.getElementById('export-btn').disabled = false;
+  document.getElementById('upload-wrap').style.display = 'none';
+  document.getElementById('filter-bar').style.display = 'flex';
+  document.getElementById('table-section').style.display = 'block';
+  document.getElementById('empty-state').style.display = 'none';
+}
+
+// ─── FILTERS ─────────────────────────────────────────────────────────────────
+function applyFilters() {
+  const { search, city, cat, status, starred } = state.filters;
+  const q = search.toLowerCase();
+  state.filtered = state.leads.filter(l => {
+    if (starred && !l.starred) return false;
+    if (city && l.city.toLowerCase() !== city.toLowerCase()) return false;
+    if (cat && l.category.toLowerCase() !== cat.toLowerCase()) return false;
+    if (status && l.status !== status) return false;
+    if (q) {
+      const hay = [l.businessName,l.category,l.city,l.area,l.notes].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  if (state.sortCol) sortFiltered();
+}
+
+function sortFiltered() {
+  const col = state.sortCol, dir = state.sortDir;
+  state.filtered.sort((a,b) => {
+    const av = (a[col]||'').toString(), bv = (b[col]||'').toString();
+    const cmp = av.localeCompare(bv, undefined, {numeric:true});
+    return dir === 'asc' ? cmp : -cmp;
+  });
+}
+
+// ─── PAGINATION HELPERS ───────────────────────────────────────────────────────
+function totalPages() {
+  if (page.size === 0) return 1;
+  return Math.max(1, Math.ceil(state.filtered.length / page.size));
+}
+
+function getPagedData() {
+  if (page.size === 0) return state.filtered;
+  const start = (page.current - 1) * page.size;
+  return state.filtered.slice(start, start + page.size);
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function renderAll() {
+  renderStats();
+  renderTable();
+}
+
+function renderStats() {
+  const leads = state.leads;
+  const total = leads.length;
+  const nNew = leads.filter(l => l.status==='New').length;
+  const nReached = leads.filter(l => l.status==='Reached').length;
+  const nConfirmed = leads.filter(l => l.status==='Confirmed').length;
+  const nRejected = leads.filter(l => l.status==='Rejected').length;
+  const rate = total ? Math.round((nConfirmed / total) * 100) : 0;
+
+  document.getElementById('stat-total').textContent = total || '—';
+  document.getElementById('stat-new').textContent = total ? nNew : '—';
+  document.getElementById('stat-reached').textContent = total ? nReached : '—';
+  document.getElementById('stat-confirmed').textContent = total ? nConfirmed : '—';
+  document.getElementById('stat-rejected').textContent = total ? nRejected : '—';
+  document.getElementById('stat-rate').textContent = total ? rate + '%' : '—';
+
+  if (total) {
+    const pct = n => Math.max(2, Math.round((n / total) * 100));
+    document.getElementById('bar-new').style.width = pct(nNew) + '%';
+    document.getElementById('bar-reached').style.width = pct(nReached) + '%';
+    document.getElementById('bar-confirmed').style.width = pct(nConfirmed) + '%';
+    document.getElementById('bar-rejected').style.width = pct(nRejected) + '%';
+    document.getElementById('bar-rate').style.width = Math.max(2, rate) + '%';
+    document.getElementById('pct-new').textContent = Math.round((nNew/total)*100) + '%';
+    document.getElementById('pct-reached').textContent = Math.round((nReached/total)*100) + '%';
+    document.getElementById('pct-confirmed').textContent = Math.round((nConfirmed/total)*100) + '%';
+    document.getElementById('pct-rejected').textContent = Math.round((nRejected/total)*100) + '%';
+    document.getElementById('pct-rate').textContent = 'confirmed of total';
+  }
+}
+
+function qBadge(q) {
+  const qn = (q||'').toLowerCase();
+  if (qn.includes('high')) return `<span class="badge badge-high">High</span>`;
+  if (qn.includes('med')) return `<span class="badge badge-medium">Med</span>`;
+  if (qn.includes('low')) return `<span class="badge badge-low">Low</span>`;
+  return q ? `<span class="badge badge-low">${q}</span>` : '';
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tbody');
+  const noRes = document.getElementById('no-results');
+  const fi = document.getElementById('filter-info');
+  const total = state.leads.length;
+  const shown = state.filtered.length;
+
+  if (shown === 0) {
+    tbody.innerHTML = '';
+    noRes.style.display = 'block';
+    fi.textContent = `0 of ${total}`;
+    renderPagination();
+    return;
+  }
+  noRes.style.display = 'none';
+  fi.textContent = shown === total ? `${total} leads` : `${shown} of ${total} leads`;
+
+  const pagedData = getPagedData();
+
+  const rows = pagedData.map(l => {
+    const ph = cleanPhone(l.phone);
+    const hasPhone = ph.length >= 10;
+    const isSelected = state.selected.has(l._id);
+    const statusOpts = ['New','Reached','Confirmed','Rejected']
+      .map(s => `<option value="${s}"${s===l.status?' selected':''}>${s}</option>`).join('');
+    const starFill = l.starred ? '#f59e0b' : 'none';
+    const starStroke = l.starred ? '#f59e0b' : 'currentColor';
+
+    return `<tr class="row-${l.status.toLowerCase()}${isSelected?' selected':''}" data-id="${l._id}">
+<td class="col-check" onclick="event.stopPropagation()"><input type="checkbox" class="row-check" data-id="${l._id}"${isSelected?' checked':''}></td>
+<td class="col-star" onclick="event.stopPropagation()">
+  <button class="star-btn${l.starred?' starred':''}" data-star="${l._id}" title="${l.starred?'Unstar':'Star this lead'}">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="${starFill}" stroke="${starStroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+  </button>
+</td>
+<td class="sno">${l.sno}</td>
+<td class="name">
+  <span class="biz-name" title="${escHtml(l.businessName)}">${escHtml(l.businessName)}</span>
+  <span class="biz-cat">${escHtml(l.category)}</span>
+</td>
+<td class="loc">
+  <span class="city">${escHtml(l.city)}</span>
+  <span class="area" title="${escHtml(l.area)}">${escHtml(l.area)}</span>
+</td>
+<td class="contact-cell">
+  ${hasPhone
+    ? `<a class="phone-link" href="tel:+${ph}" title="${escHtml(l.phone)}" onclick="event.stopPropagation()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.88a16 16 0 0 0 6 6l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        ${displayPhone(l.phone)}</a>`
+    : `<span class="phone-link disabled">No phone</span>`}
+</td>
+<td class="contact-cell">
+  ${hasPhone
+    ? `<button class="wa-btn" data-id="${l._id}" onclick="event.stopPropagation()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        WhatsApp</button>`
+    : `<button class="wa-btn" disabled>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        WhatsApp</button>`}
+</td>
+<td>${qBadge(l.quality)}</td>
+<td>
+  <select class="status-sel sel-${l.status}" data-id="${l._id}" onclick="event.stopPropagation()">
+    ${statusOpts}
+  </select>
+</td>
+<td>
+  <input class="notes-inp" type="text" data-id="${l._id}" value="${escHtml(l.notes)}" placeholder="Add note…" onclick="event.stopPropagation()">
+</td>
+<td>
+  <button class="btn btn-ghost btn-icon" data-draft="${l._id}" title="Draft WhatsApp message" onclick="event.stopPropagation()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14l4-4h14a2 2 0 0 0 2-2V10"/><path d="M18 2l4 4-4 4"/><path d="M22 6H14"/></svg>
+  </button>
+</td>
+</tr>`;
+  });
+
+  tbody.innerHTML = rows.join('');
+  updateSortIndicators();
+  renderPagination();
+  syncSelectAll();
+}
+
+function renderPagination() {
+  const total = state.filtered.length;
+  const tp = totalPages();
+  const sz = page.size;
+  const start = sz === 0 ? 1 : (page.current - 1) * sz + 1;
+  const end = sz === 0 ? total : Math.min(page.current * sz, total);
+  document.getElementById('page-info').textContent = total > 0
+    ? `Showing ${start}–${end} of ${total} leads`
+    : 'No leads to show';
+  document.getElementById('page-num').textContent = `${page.current} / ${tp}`;
+  document.getElementById('page-prev').disabled = page.current <= 1;
+  document.getElementById('page-next').disabled = page.current >= tp;
+}
+
+function syncSelectAll() {
+  const pagedIds = getPagedData().map(l => l._id);
+  const allChecked = pagedIds.length > 0 && pagedIds.every(id => state.selected.has(id));
+  const el = document.getElementById('select-all');
+  if (el) { el.checked = allChecked; el.indeterminate = !allChecked && pagedIds.some(id => state.selected.has(id)); }
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── BULK ACTIONS ─────────────────────────────────────────────────────────────
+function updateBulkBar() {
+  const n = state.selected.size;
+  const bar = document.getElementById('bulk-bar');
+  if (n > 0) {
+    bar.classList.add('visible');
+    document.getElementById('bulk-count').textContent = `${n} lead${n > 1 ? 's' : ''} selected`;
+  } else {
+    bar.classList.remove('visible');
+    document.getElementById('bulk-status-sel').value = '';
+  }
+}
+
+// ─── STAR TOGGLE ─────────────────────────────────────────────────────────────
+function toggleStar(id) {
+  const lead = state.leads.find(l => l._id === id);
+  if (!lead) return;
+  lead.starred = !lead.starred;
+  deferSave();
+  if (state.filters.starred) { applyFilters(); renderAll(); return; }
+  const btn = document.querySelector(`.star-btn[data-star="${id}"]`);
+  if (btn) {
+    btn.classList.toggle('starred', lead.starred);
+    const svg = btn.querySelector('svg');
+    if (svg) {
+      svg.setAttribute('fill', lead.starred ? '#f59e0b' : 'none');
+      svg.setAttribute('stroke', lead.starred ? '#f59e0b' : 'currentColor');
+    }
+    btn.title = lead.starred ? 'Unstar' : 'Star this lead';
+  }
+}
+
+// ─── SORT HEADERS ─────────────────────────────────────────────────────────────
+function updateSortIndicators() {
+  document.querySelectorAll('thead th').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+    if (th.dataset.col === state.sortCol) th.classList.add(state.sortDir==='asc'?'sort-asc':'sort-desc');
+  });
+}
+
+// ─── FILTER DROPDOWNS ─────────────────────────────────────────────────────────
+function populateFilterDropdowns() {
+  const cities = [...new Set(state.leads.map(l=>l.city).filter(Boolean))].sort();
+  const cats = [...new Set(state.leads.map(l=>l.category).filter(Boolean))].sort();
+  document.getElementById('filter-city').innerHTML = '<option value="">All Cities</option>' + cities.map(c=>`<option>${escHtml(c)}</option>`).join('');
+  document.getElementById('filter-cat').innerHTML = '<option value="">All Categories</option>' + cats.map(c=>`<option>${escHtml(c)}</option>`).join('');
+}
+
+// ─── WA MODAL ─────────────────────────────────────────────────────────────────
+function openModal(id) {
+  const lead = state.leads.find(l => l._id === id);
+  if (!lead) return;
+  state.activeModal = lead;
+  const tpl = getTemplate(lead.category);
+  const msg = tpl
+    .replace(/{businessName}/g, lead.businessName || 'your business')
+    .replace(/{city}/g, lead.city || 'your city')
+    .replace(/{area}/g, lead.area || 'your area')
+    .replace(/{sender}/g, SENDER);
+
+  document.getElementById('modal-biz-name').textContent = lead.businessName;
+  document.getElementById('modal-cat').textContent = lead.category || '—';
+  document.getElementById('modal-loc').textContent = [lead.area, lead.city].filter(Boolean).join(', ') || '—';
+  document.getElementById('modal-phone').textContent = lead.phone || 'No phone';
+  document.getElementById('modal-quality').textContent = lead.quality || '—';
+  document.getElementById('modal-status').textContent = lead.status;
+  document.getElementById('wa-textarea').value = msg;
+  document.getElementById('copy-feedback').classList.remove('show');
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  state.activeModal = null;
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (type ? ' '+type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = ''; }, 2400);
+}
+
+// ─── EXPORT ───────────────────────────────────────────────────────────────────
+function exportCSV() {
+  const leads = state.filtered;
+  if (!leads.length) { showToast('No leads to export', 'error'); return; }
+  const headers = ['S.No','Business Name','Category','City','Area','Phone','Email','Website','Quality','Status','Notes','Source','Starred'];
+  const rows = leads.map(l => [
+    l.sno, l.businessName, l.category, l.city, l.area,
+    l.phone, l.email, l.website, l.quality, l.status, l.notes, l.source, l.starred ? 'Yes' : 'No'
+  ].map(v => `"${String(v||'').replace(/"/g,'""')}"`));
+  const csv = [headers.join(','), ...rows.map(r=>r.join(','))].join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `leads-export-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast(`Exported ${leads.length} leads`, 'success');
+}
+
+// ─── EVENT BINDING ─────────────────────────────────────────────────────────────
+function bindEvents() {
+  // File upload zone
+  const zone = document.getElementById('upload-zone');
+  const input = document.getElementById('file-input');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag');
+    const file = e.dataTransfer.files[0];
+    if (file) parseFile(file);
+  });
+  input.addEventListener('change', e => { if (e.target.files[0]) parseFile(e.target.files[0]); });
+
+  // Header upload button
+  document.getElementById('upload-btn-header').addEventListener('click', () => {
+    document.getElementById('upload-wrap').style.display = 'block';
+    document.getElementById('filter-bar').style.display = 'none';
+    document.getElementById('table-section').style.display = 'none';
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('bulk-bar').classList.remove('visible');
+    state.leads = [];
+    state.selected.clear();
+    document.getElementById('export-btn').disabled = true;
+  });
+
+  // Export
+  document.getElementById('export-btn').addEventListener('click', exportCSV);
+
+  // Search (debounced)
+  let searchTimer;
+  document.getElementById('search').addEventListener('input', e => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      state.filters.search = e.target.value;
+      page.current = 1;
+      applyFilters(); renderTable();
+    }, 200);
+  });
+
+  // Filter selects
+  document.getElementById('filter-city').addEventListener('change', e => {
+    state.filters.city = e.target.value; page.current = 1; applyFilters(); renderTable();
+  });
+  document.getElementById('filter-cat').addEventListener('change', e => {
+    state.filters.cat = e.target.value; page.current = 1; applyFilters(); renderTable();
+  });
+  document.getElementById('filter-status').addEventListener('change', e => {
+    state.filters.status = e.target.value; page.current = 1; applyFilters(); renderTable();
+  });
+
+  // Starred filter toggle
+  document.getElementById('filter-starred').addEventListener('click', function() {
+    state.filters.starred = !state.filters.starred;
+    this.classList.toggle('active', state.filters.starred);
+    page.current = 1; applyFilters(); renderTable();
+  });
+
+  // Clear filters
+  document.getElementById('clear-filters').addEventListener('click', () => {
+    state.filters = { search:'', city:'', cat:'', status:'', starred:false };
+    document.getElementById('search').value = '';
+    document.getElementById('filter-city').value = '';
+    document.getElementById('filter-cat').value = '';
+    document.getElementById('filter-status').value = '';
+    document.getElementById('filter-starred').classList.remove('active');
+    page.current = 1; applyFilters(); renderTable();
+  });
+
+  // Sort headers
+  document.querySelectorAll('thead th[data-col]').forEach(th => {
+    if (th.classList.contains('no-sort')) return;
+    th.addEventListener('click', () => {
+      const col = th.dataset.col;
+      if (state.sortCol === col) state.sortDir = state.sortDir==='asc'?'desc':'asc';
+      else { state.sortCol = col; state.sortDir = 'asc'; }
+      page.current = 1; sortFiltered(); renderTable();
+    });
+  });
+
+  // Select all checkbox
+  document.getElementById('select-all').addEventListener('change', e => {
+    const pagedIds = getPagedData().map(l => l._id);
+    if (e.target.checked) pagedIds.forEach(id => state.selected.add(id));
+    else pagedIds.forEach(id => state.selected.delete(id));
+    updateBulkBar();
+    // Update row checkboxes
+    document.querySelectorAll('.row-check').forEach(cb => {
+      cb.checked = state.selected.has(cb.dataset.id);
+      const tr = cb.closest('tr');
+      if (tr) tr.classList.toggle('selected', state.selected.has(cb.dataset.id));
+    });
+  });
+
+  // Bulk apply
+  document.getElementById('bulk-apply').addEventListener('click', () => {
+    const newStatus = document.getElementById('bulk-status-sel').value;
+    if (!newStatus) { showToast('Choose a status first', 'error'); return; }
+    let count = 0;
+    state.selected.forEach(id => {
+      const lead = state.leads.find(l => l._id === id);
+      if (lead) { lead.status = newStatus; count++; }
+    });
+    state.selected.clear();
+    document.getElementById('bulk-bar').classList.remove('visible');
+    deferSave(); applyFilters(); renderAll();
+    showToast(`Updated ${count} leads to ${newStatus}`, 'success');
+  });
+
+  // Bulk clear
+  document.getElementById('bulk-clear').addEventListener('click', () => {
+    state.selected.clear();
+    updateBulkBar();
+    document.querySelectorAll('.row-check').forEach(cb => {
+      cb.checked = false;
+      const tr = cb.closest('tr');
+      if (tr) tr.classList.remove('selected');
+    });
+    syncSelectAll();
+  });
+
+  // Pagination
+  document.getElementById('page-prev').addEventListener('click', () => {
+    if (page.current > 1) { page.current--; renderTable(); }
+  });
+  document.getElementById('page-next').addEventListener('click', () => {
+    if (page.current < totalPages()) { page.current++; renderTable(); }
+  });
+  document.getElementById('page-size-sel').addEventListener('change', e => {
+    page.size = parseInt(e.target.value); page.current = 1; renderTable();
+  });
+
+  // Table delegation
+  document.getElementById('tbody').addEventListener('click', e => {
+    const waBtn = e.target.closest('.wa-btn');
+    const draftBtn = e.target.closest('[data-draft]');
+    const starBtn = e.target.closest('.star-btn');
+    const check = e.target.closest('.row-check');
+    if (waBtn) { openModal(waBtn.dataset.id); return; }
+    if (draftBtn) { openModal(draftBtn.dataset.draft); return; }
+    if (starBtn) { toggleStar(starBtn.dataset.star); return; }
+    if (check) return; // handled by change event below
+    const tr = e.target.closest('tr[data-id]');
+    if (tr) openModal(tr.dataset.id);
+  });
+
+  document.getElementById('tbody').addEventListener('change', e => {
+    const sel = e.target.closest('select.status-sel');
+    const cb = e.target.closest('.row-check');
+    if (sel) {
+      const id = sel.dataset.id;
+      const lead = state.leads.find(l => l._id === id);
+      if (lead) {
+        lead.status = sel.value;
+        sel.className = `status-sel sel-${sel.value}`;
+        const tr = sel.closest('tr');
+        if (tr) tr.className = `row-${sel.value.toLowerCase()}${state.selected.has(id)?' selected':''}`;
+        renderStats(); deferSave();
+      }
+    }
+    if (cb) {
+      const id = cb.dataset.id;
+      if (cb.checked) state.selected.add(id);
+      else state.selected.delete(id);
+      const tr = cb.closest('tr');
+      if (tr) tr.classList.toggle('selected', cb.checked);
+      updateBulkBar(); syncSelectAll();
+    }
+  });
+
+  document.getElementById('tbody').addEventListener('input', e => {
+    const inp = e.target.closest('input.notes-inp');
+    if (inp) {
+      const id = inp.dataset.id;
+      const lead = state.leads.find(l => l._id === id);
+      if (lead) { lead.notes = inp.value; deferSave(); }
+    }
+  });
+
+  // Modal
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('modal-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  document.getElementById('copy-btn').addEventListener('click', () => {
+    const txt = document.getElementById('wa-textarea').value;
+    navigator.clipboard.writeText(txt).then(() => {
+      const fb = document.getElementById('copy-feedback');
+      fb.classList.add('show');
+      setTimeout(() => fb.classList.remove('show'), 2000);
+      showToast('Message copied!', 'success');
+    }).catch(() => {
+      document.getElementById('wa-textarea').select();
+      document.execCommand('copy');
+      showToast('Message copied!', 'success');
+    });
+  });
+
+  document.getElementById('open-wa-btn').addEventListener('click', () => {
+    const lead = state.activeModal;
+    if (!lead) return;
+    const ph = cleanPhone(lead.phone);
+    if (!ph) { showToast('No phone number available', 'error'); return; }
+    const msg = document.getElementById('wa-textarea').value;
+    const url = `https://wa.me/${ph}?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+    if (lead.status === 'New') {
+      lead.status = 'Reached';
+      deferSave(); applyFilters(); renderAll();
+      showToast('Status updated to Reached', 'success');
+    }
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => { bindEvents(); });
+</script>
+</body>
+</html>
