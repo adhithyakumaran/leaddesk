@@ -199,7 +199,7 @@ select.filter-sel:focus{border-color:#555;color:var(--text)}
 #filter-info{font-size:11px;color:var(--text3);white-space:nowrap;margin-left:auto}
 
 /* ── TABLE CONTAINER ── */
-#table-wrap{padding:0 28px 0;overflow-x:auto}
+#table-wrap{padding:0;overflow-x:auto}
 table{
   width:100%;border-collapse:separate;border-spacing:0;
   table-layout:fixed;
@@ -220,8 +220,8 @@ th.col-star,td.col-star{width:32px;padding:0 4px;text-align:center;cursor:defaul
 th.col-sno,td.col-sno{width:40px}
 th.col-biz,td.col-biz{width:22%}
 th.col-loc,td.col-loc{width:14%}
-th.col-phone,td.col-phone{width:110px}
-th.col-wa,td.col-wa{width:110px}
+th.col-phone,td.col-phone{width:130px}
+th.col-wa,td.col-wa{width:115px}
 th.col-q,td.col-q{width:72px}
 th.col-status,td.col-status{width:110px}
 th.col-notes,td.col-notes{width:auto}
@@ -237,7 +237,7 @@ tbody tr.row-confirmed{border-left:2px solid var(--confirmed)}
 tbody tr.row-rejected{border-left:2px solid var(--rejected)}
 tbody tr.row-new{border-left:2px solid transparent}
 
-td{padding:9px 10px;vertical-align:middle;color:var(--text);overflow:hidden}
+td{padding:9px 10px;vertical-align:middle;color:var(--text)}
 td.sno{color:var(--text3);font-size:11px;font-variant-numeric:tabular-nums}
 td.name{font-weight:600;color:var(--white)}
 td.name .biz-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
@@ -255,7 +255,6 @@ td.loc .area{font-size:11px;color:var(--text3);margin-top:2px;white-space:nowrap
 .star-btn.starred{color:var(--star)}
 
 /* ── PHONE / WA CELLS ── */
-td.contact-cell{width:90px}
 a.phone-link{
   display:inline-flex;align-items:center;gap:5px;
   color:var(--text2);text-decoration:none;font-size:11px;font-weight:500;
@@ -1601,9 +1600,7 @@ function bindEvents() {
     if (!ph) { showToast('No phone number available', 'error'); return; }
     const msg = document.getElementById('wa-textarea').value;
     const url = `https://wa.me/${ph}?text=${encodeURIComponent(msg)}`;
-    const a = document.createElement('a');
-    a.href = url; a.target = '_blank'; a.rel = 'noopener';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    window.open(url, '_blank');
     if (lead.status === 'New') {
       lead.status = 'Reached';
       deferSave(); applyFilters(); renderAll();
